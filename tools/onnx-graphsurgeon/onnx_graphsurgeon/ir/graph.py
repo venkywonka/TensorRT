@@ -1021,9 +1021,13 @@ class Graph(object):
 
         return self
 
-    def _generate_name(self, prefix):
-        name = "{}_{}".format(prefix, self.name_idx)
-        self.name_idx += 1
+    def _generate_name(self, prefix, existing_names=None):
+        
+        while True:
+            name = "{}_{}".format(prefix, self.name_idx)
+            self.name_idx += 1
+            if existing_names is None or name not in existing_names: # Ensure generated name is unique
+                break
         return name
 
     def layer(self, inputs=[], outputs=[], *args, **kwargs):
@@ -1086,7 +1090,8 @@ class Graph(object):
         outputs = process_io(outputs)
 
         if "name" not in kwargs:
-            kwargs["name"] = self._generate_name("onnx_graphsurgeon_node")
+            kwargs["name"] = self._generate_name("onnx_graphsurgeon_node",
+                                                 existing_names=set([node.name for node in self.nodes]))
 
         node = Node(*args, **kwargs, inputs=inputs, outputs=outputs)
         self.nodes.append(node)

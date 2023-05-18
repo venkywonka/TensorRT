@@ -77,32 +77,39 @@ def volume(obj):
     return vol
 
 def check_duplicate(obj_list, attr, level="warning"):
-    # check if the `attr` in list of `obj` is unique print/raise error
-    # level: "warning" or "error"
+    # Check if the `attr` attribute in a list of `obj` is unique. If not, log a warning or a critical message.
+    
+    # Args:
+    # obj_list (list): List of objects to check.
+    # attr (str): Attribute to check for uniqueness.
+    # level (str): Level of logging - "warning" or "critical". Defaults to "warning".
+    
+    # Note:
+    # Empty string or None attribute values are not considered duplicates.
+
     names = OrderedDict()
     for obj in obj_list:
         if obj is not None:
-            # check if `attr` in `obj` is in names
-            if hasattr(obj, attr):
-                if getattr(obj, attr) in names:
-                    msg = "Found distinct Nodes that share the same attribute `{}`:\n[id: {:}]:\n {:}---\n[id: {:}]:\n {:}\n".format(
-                                    attr,
-                                    id(names[getattr(obj, attr)]),
-                                    names[getattr(obj, attr)],
-                                    id(obj),
-                                    obj,
-                                )
-                    if level == "warning":
-                        G_LOGGER.warning(msg)
-                    elif level == "critical":
-                        G_LOGGER.critical(msg)
-                else:
-                    names[getattr(obj, attr)] = obj
+            if not hasattr(obj, attr):
+                G_LOGGER.critical(
+                    "Provided attr {:} is not in obj {:}".format(attr, obj)
+                )
+            if getattr(obj, attr) == "" or getattr(obj, attr) is None:
+                continue
+            elif getattr(obj, attr) in names:
+                msg = "Found distinct Nodes that share the same attribute `{}`:\n[id: {:}]:\n {:}---\n[id: {:}]:\n {:}\n".format(
+                                attr,
+                                id(names[getattr(obj, attr)]),
+                                names[getattr(obj, attr)],
+                                id(obj),
+                                obj,
+                            )
+                if level == "warning":
+                    G_LOGGER.warning(msg)
+                elif level == "critical":
+                    G_LOGGER.critical(msg)
             else:
-                # provided attr is not in obj
-                # raise error
-                G_LOGGER.critical("Provided attr {:} is not in obj {:}".format(attr, obj))
-
+                names[getattr(obj, attr)] = obj
 
 # Special type of list that synchronizes contents with another list.
 # Concrete example: Assume some node, n, contains an input tensor, t. If we remove t from n.inputs,

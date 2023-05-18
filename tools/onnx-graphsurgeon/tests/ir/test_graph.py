@@ -242,6 +242,15 @@ class TestRegister(object):
 
 
 class TestLayer(object):
+    def test_layer_default_naming(self):
+        node1 = Node(name="onnx_graphsurgeon_node_0", op="Identity") # injecting default name
+        node2 = Node(name="onnx_graphsurgeon_node_1", op="Identity") # injecting default name again
+        graph = Graph(nodes=[node1, node2])
+        graph.layer(op="Identity") # new default name should be onnx_graphsurgeon_node_2
+        assert graph.nodes[-1].name == "onnx_graphsurgeon_node_2"
+        graph.layer(op="Identity") # new default name should be onnx_graphsurgeon_node_3
+        assert graph.nodes[-1].name == "onnx_graphsurgeon_node_3"
+
     def test_layer_with_attrs(self):
         graph = Graph()
         outputs = graph.layer(op="Add", name="node", attrs={"fake_attr": 0})
