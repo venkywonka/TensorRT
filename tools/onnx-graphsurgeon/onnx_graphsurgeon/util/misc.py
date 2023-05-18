@@ -18,6 +18,8 @@
 from collections import OrderedDict
 from typing import List, Sequence
 
+from onnx_graphsurgeon.logger.logger import G_LOGGER
+
 # default_value exists to solve issues that might result from Python's normal default argument behavior.
 # Specifically, consider the following class:
 #
@@ -73,6 +75,33 @@ def volume(obj):
     for elem in obj:
         vol *= elem
     return vol
+
+def check_duplicate(obj_list, attr, level="warning"):
+    # check if the `attr` in list of `obj` is unique print/raise error
+    # level: "warning" or "error"
+    names = OrderedDict()
+    for obj in obj_list:
+        if obj is not None:
+            # check if `attr` in `obj` is in names
+            if hasattr(obj, attr):
+                if getattr(obj, attr) in names:
+                    msg = "Found distinct Nodes that share the same attribute `{}`:\n[id: {:}]:\n {:}---\n[id: {:}]:\n {:}\n".format(
+                                    attr,
+                                    id(names[getattr(obj, attr)]),
+                                    names[getattr(obj, attr)],
+                                    id(obj),
+                                    obj,
+                                )
+                    if level == "warning":
+                        G_LOGGER.warning(msg)
+                    elif level == "critical":
+                        G_LOGGER.critical(msg)
+                else:
+                    names[getattr(obj, attr)] = obj
+            else:
+                # provided attr is not in obj
+                # raise error
+                G_LOGGER.critical("Provided attr {:} is not in obj {:}".format(attr, obj))
 
 
 # Special type of list that synchronizes contents with another list.

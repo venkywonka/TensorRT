@@ -23,6 +23,7 @@ from onnx_graphsurgeon.ir.graph import Graph
 from onnx_graphsurgeon.ir.node import Node
 from onnx_graphsurgeon.ir.tensor import Constant, LazyValues, Tensor, Variable
 from onnx_graphsurgeon.logger.logger import G_LOGGER
+from onnx_graphsurgeon.util import misc
 
 
 def dtype_to_onnx(dtype: np.dtype) -> int:
@@ -94,6 +95,7 @@ class OnnxExporter(BaseExporter):
             do_type_check (bool): Whether to check that input and output tensors have data types defined, and fail if not.
         """
         nodes = [OnnxExporter.export_node(node, do_type_check) for node in graph.nodes]
+        misc.check_duplicate(nodes, "name", level="warning")
         inputs = [OnnxExporter.export_value_info_proto(inp, do_type_check) for inp in graph.inputs]
         outputs = [OnnxExporter.export_value_info_proto(out, do_type_check) for out in graph.outputs]
         tensor_map = graph.tensors()

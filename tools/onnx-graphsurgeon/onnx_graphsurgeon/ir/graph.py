@@ -121,8 +121,8 @@ class Graph(object):
             producer_version (str): The version of the generating tool. Defaults to "".
         """
         self.nodes = misc.default_value(nodes, [])
-        self.__nodenames = [node.name for node in self.nodes]
-        self._check_nodenames(self.__nodenames)
+        # self.__nodenames = [node.name for node in self.nodes]
+        # self._check_nodenames(self.__nodenames)
         self.inputs = list(misc.default_value(inputs, []))
         self.outputs = list(misc.default_value(outputs, []))
 
@@ -349,7 +349,7 @@ class Graph(object):
                             node.outputs.remove(out)
 
             self.nodes = nodes
-            self.__nodenames = [node.name for node in self.nodes]
+            # self.__nodenames = [node.name for node in self.nodes]
             return self
 
     def toposort(self, recurse_subgraphs=True):
@@ -424,7 +424,7 @@ class Graph(object):
                 hierarchy_levels[self._get_node_id(node)] = HierarchyDescriptor(node, level=get_hierarchy_level(node))
 
         self.nodes = [hd.node for hd in sorted(hierarchy_levels.values())]
-        self.__nodenames = [node.name for node in self.nodes]
+        # self.__nodenames = [node.name for node in self.nodes]
         return self
 
     def tensors(self, check_duplicates=False):
@@ -1098,8 +1098,9 @@ class Graph(object):
             kwargs["name"] = self._generate_name("onnx_graphsurgeon_node")
 
         node = Node(*args, **kwargs, inputs=inputs, outputs=outputs)
-        self.nodes.append(node); self.__nodenames.append(node.name)
-        self._check_nodenames(self.__nodenames)
+        self.nodes.append(node)
+        # self.__nodenames.append(node.name)
+        # self._check_nodenames(self.__nodenames)
         return node.outputs
 
     def copy(self, tensor_map: "OrderedDict[str, Tensor]" = None):
